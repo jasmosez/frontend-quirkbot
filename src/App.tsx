@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useRef, useEffect } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [message, setMessage] = useState('');
+  const [responses, setResponses] = useState<string[]>([]);
+  const responsesDivRef = useRef<HTMLDivElement>(null);
+
+  // Effect to scroll to bottom whenever responses change
+  useEffect(() => {
+    if (responsesDivRef.current) {
+      responsesDivRef.current.scrollTop = responsesDivRef.current.scrollHeight;
+    }
+  }, [responses]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newResponse = `You said: ${message}`;
+    setResponses([...responses, newResponse]);
+    setMessage('');
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <header className="app-header">
+        <h1 className="title">Welcome to QuirkBot ⚡</h1>
+        <p className="sub-title">Your quirky AI chatbot is ready for some fun!</p>
+      </header>
+      <div className="chat-box">
+        <div className="responses" ref={responsesDivRef}>
+          {responses.map((response, index) => (
+            <p key={index} className="response">{response}</p>
+          ))}
+        </div>
+        <form onSubmit={handleSubmit} className="chat-form">
+          <input
+            type="text"
+            placeholder="Ask me something!"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="chat-input"
+          />
+          <button type="submit" className="send-button">
+            ⚡ Send
+          </button>
+        </form>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <footer className="footer">
+        <p className="footer-text">Powered by QuirkBot ⚡</p>
+      </footer>
+    </div>
+  );
+};
 
-export default App
+export default App;
