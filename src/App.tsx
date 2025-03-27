@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
+import { config } from './config';
 
 const App = () => {
   const [message, setMessage] = useState('');
@@ -13,10 +14,28 @@ const App = () => {
     }
   }, [responses]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendMessage = async (message: string) => {
+    const response = await fetch(`${config.apiUrl}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),
+    });
+    const data = await response.json();
+    return data.response;
+  };
+  
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newResponse = `You said: ${message}`;
-    setResponses([...responses, newResponse]);
+    const newUserInput = `You said: ${message}`;
+    try {
+      const botResponse = await sendMessage(message);
+      setResponses([...responses, newUserInput, botResponse]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
     setMessage('');
   };
 
